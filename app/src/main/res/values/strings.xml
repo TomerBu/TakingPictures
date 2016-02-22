@@ -1,0 +1,11 @@
+<resources>
+    <string name="app_name">UploadingPhotos</string>
+    <string name="action_settings">Settings</string>
+    <string name="permission_camera_rationale">This app requires Images...</string>
+    <string name="button_allow">OK</string>
+    <string name="button_deny">NO</string>
+    <string name="permission_camera_denied">Camera Permissions denied</string>
+    <string name="permission_camera_neverask">Camera permissions set to never ask again</string>
+    <string name="action_take_picture">Take Picture</string>
+    <string name="action_pick_picture">Pick A picture</string>
+</resources>
