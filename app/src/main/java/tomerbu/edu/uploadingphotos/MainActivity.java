@@ -3,11 +3,13 @@ package tomerbu.edu.uploadingphotos;
 import android.Manifest;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v4.content.CursorLoader;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -131,19 +133,38 @@ public class MainActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
         switch (requestCode) {
             case REQ_PICK_PICTURE:
-                Toast.makeText(MainActivity.this, resultCode == RESULT_OK ? "OK" : "oops", Toast.LENGTH_SHORT).show();
                 Uri selectedImageUri = data.getData();
                 Picasso.with(this).load(selectedImageUri).into(ivDemo);
+                extractImage(data);
                 break;
             case REQ_TAKE_PICTURE:
                 addPictureToGallery();
                 Picasso.with(this).load(new File(mFilePath)).placeholder(android.R.drawable.ic_menu_gallery).into(ivDemo);
+                uploadImage(mFilePath);
                 break;
         }
     }
 
+    private void extractImage(Intent data) {
+        Uri selectedImageUri = data.getData();
+        String[] projection = {MediaStore.MediaColumns.DATA};
+        CursorLoader cursorLoader = new CursorLoader(this, selectedImageUri, projection, null, null,
+                null);
+        Cursor cursor = cursorLoader.loadInBackground();
+        int column_index = cursor.getColumnIndexOrThrow(MediaStore.MediaColumns.DATA);
+        cursor.moveToFirst();
+        String selectedImagePath = cursor.getString(column_index);
+        Toast.makeText(MainActivity.this, selectedImagePath, Toast.LENGTH_SHORT).show();
+        uploadImage(mFilePath);
+    }
+
+    private void uploadImage(String filePath) {
+
+
+    }
+
     @OnShowRationale(Manifest.permission.WRITE_EXTERNAL_STORAGE)
-    void showRationaleForCamera(final PermissionRequest request) {
+    void showRationaleForSDCard(final PermissionRequest request) {
         //request only has 2 methods: cancel & proceed
         new AlertDialog.Builder(this)
                 .setMessage(R.string.permission_camera_rationale)
@@ -163,12 +184,12 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @OnPermissionDenied(Manifest.permission.WRITE_EXTERNAL_STORAGE)
-    void showDeniedForCamera() {
+    void showDeniedForSDCard() {
         Toast.makeText(this, R.string.permission_camera_denied, Toast.LENGTH_SHORT).show();
     }
 
     @OnNeverAskAgain(Manifest.permission.WRITE_EXTERNAL_STORAGE)
-    void showNeverAskForCamera() {
+    void showNeverAskForSDCard() {
         Toast.makeText(this, R.string.permission_camera_neverask, Toast.LENGTH_SHORT).show();
     }
 
