@@ -20,8 +20,6 @@ import com.squareup.picasso.Picasso;
 
 import java.io.File;
 import java.io.IOException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -76,6 +74,7 @@ public class MainActivity extends AppCompatActivity {
                 MainActivityPermissionsDispatcher.takePictureWithCheck(this);
                 return true;
             case R.id.action_pick_picture:
+                MainActivityPermissionsDispatcher.pickPictureWithCheck(this);
                 return true;
             case R.id.action_settings:
                 return true;
@@ -93,6 +92,12 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @NeedsPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+    void pickPicture() {
+        Intent pickIntent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+        startActivityForResult(pickIntent, REQ_PICK_PICTURE);
+    }
+
+    @NeedsPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)
     void takePicture() {
         Intent camIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         camIntent.setData(null);
@@ -100,8 +105,8 @@ public class MainActivity extends AppCompatActivity {
         try {
             File storageDir = Environment.getExternalStoragePublicDirectory(
                     Environment.DIRECTORY_PICTURES);
-            String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
-            String imageFileName = "JPEG_" + timeStamp + "_";
+            long timeStamp = System.currentTimeMillis();
+            String imageFileName = "IMG_" + timeStamp + "_Yay";
             photoFile = File.createTempFile(imageFileName, ".jpg", storageDir);
             mFilePath = photoFile.getAbsolutePath();
             camIntent.putExtra(MediaStore.EXTRA_OUTPUT,
@@ -111,7 +116,14 @@ public class MainActivity extends AppCompatActivity {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
 
+    private void addPictureToGallery() {
+        Intent mediaScanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
+        File f = new File(mFilePath);
+        Uri contentUri = Uri.fromFile(f);
+        mediaScanIntent.setData(contentUri);
+        this.sendBroadcast(mediaScanIntent);
     }
 
     @Override
@@ -120,10 +132,11 @@ public class MainActivity extends AppCompatActivity {
         switch (requestCode) {
             case REQ_PICK_PICTURE:
                 Toast.makeText(MainActivity.this, resultCode == RESULT_OK ? "OK" : "oops", Toast.LENGTH_SHORT).show();
-
+                Uri selectedImageUri = data.getData();
+                Picasso.with(this).load(selectedImageUri).into(ivDemo);
                 break;
             case REQ_TAKE_PICTURE:
-                Toast.makeText(MainActivity.this, resultCode == RESULT_OK ? "OK" : "oops", Toast.LENGTH_SHORT).show();
+                addPictureToGallery();
                 Picasso.with(this).load(new File(mFilePath)).placeholder(android.R.drawable.ic_menu_gallery).into(ivDemo);
                 break;
         }
@@ -131,6 +144,7 @@ public class MainActivity extends AppCompatActivity {
 
     @OnShowRationale(Manifest.permission.WRITE_EXTERNAL_STORAGE)
     void showRationaleForCamera(final PermissionRequest request) {
+        //request only has 2 methods: cancel & proceed
         new AlertDialog.Builder(this)
                 .setMessage(R.string.permission_camera_rationale)
                 .setPositiveButton(R.string.button_allow, new DialogInterface.OnClickListener() {
