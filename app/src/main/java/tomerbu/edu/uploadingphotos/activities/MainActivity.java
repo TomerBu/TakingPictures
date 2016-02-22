@@ -1,4 +1,4 @@
-package tomerbu.edu.uploadingphotos;
+package tomerbu.edu.uploadingphotos.activities;
 
 import android.Manifest;
 import android.content.DialogInterface;
@@ -32,6 +32,8 @@ import permissions.dispatcher.OnPermissionDenied;
 import permissions.dispatcher.OnShowRationale;
 import permissions.dispatcher.PermissionRequest;
 import permissions.dispatcher.RuntimePermissions;
+import tomerbu.edu.uploadingphotos.R;
+import tomerbu.edu.uploadingphotos.api.ImageUploadAPI;
 
 @RuntimePermissions
 public class MainActivity extends AppCompatActivity {
@@ -155,12 +157,13 @@ public class MainActivity extends AppCompatActivity {
         cursor.moveToFirst();
         String selectedImagePath = cursor.getString(column_index);
         Toast.makeText(MainActivity.this, selectedImagePath, Toast.LENGTH_SHORT).show();
-        uploadImage(mFilePath);
+        uploadImage(selectedImagePath);
     }
 
     private void uploadImage(String filePath) {
 
-
+        ImageUploadAPI api = new ImageUploadAPI();
+        api.uploadImage(filePath);
     }
 
     @OnShowRationale(Manifest.permission.WRITE_EXTERNAL_STORAGE)
