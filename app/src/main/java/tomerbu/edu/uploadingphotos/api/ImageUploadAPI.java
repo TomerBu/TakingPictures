@@ -9,6 +9,7 @@ import retrofit2.Callback;
 import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
+import retrofit2.http.Headers;
 import retrofit2.http.Multipart;
 import retrofit2.http.POST;
 import retrofit2.http.Part;
@@ -18,6 +19,8 @@ import tomerbu.edu.uploadingphotos.AppManager;
 public class ImageUploadAPI {
 
     private static long CACHE_SIZE = 10 * 1024 * 1024; // 10 MB
+    private static final MediaType MEDIA_TYPE_PNG = MediaType.parse("image/png");
+    private static final MediaType MEDIA_TYPE_JPEG = MediaType.parse("image/jpg");
 
     //The Apis root address without the node name:
     public static final String API_URL = "https://imagepusher.herokuapp.com/";
@@ -42,7 +45,7 @@ public class ImageUploadAPI {
 
 
         @Multipart
-        //@Headers({"Accept", "application/json"})
+        @Headers({"Accept: application/json"})
         @POST("upload")
         Call<ImageResposnse> uploadImage(@Part("fileUpload\"; filename=\"picture.jpg\" ") RequestBody file);
 
@@ -50,8 +53,7 @@ public class ImageUploadAPI {
     }
 
     public void uploadImage(String imageUri) {
-        MediaType MEDIA_TYPE_PNG = MediaType.parse("image/png");
-        MediaType MEDIA_TYPE_JPEG = MediaType.parse("image/jpg");
+
         File file = new File(imageUri);
         RequestBody requestBody = RequestBody.create(MEDIA_TYPE_JPEG, file);
 
