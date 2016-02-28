@@ -13,6 +13,7 @@ import android.support.v4.content.CursorLoader;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ImageView;
@@ -34,6 +35,8 @@ import permissions.dispatcher.PermissionRequest;
 import permissions.dispatcher.RuntimePermissions;
 import tomerbu.edu.uploadingphotos.R;
 import tomerbu.edu.uploadingphotos.api.ImageUploadAPI;
+import tomerbu.edu.uploadingphotos.api.LoginResponse;
+import tomerbu.edu.uploadingphotos.api.OnTokenReceivedListener;
 
 @RuntimePermissions
 public class MainActivity extends AppCompatActivity {
@@ -163,7 +166,7 @@ public class MainActivity extends AppCompatActivity {
     private void uploadImage(String filePath) {
 
         ImageUploadAPI api = new ImageUploadAPI();
-        api.uploadImage(filePath);
+        api.uploadImage(filePath, "1");
     }
 
     @OnShowRationale(Manifest.permission.WRITE_EXTERNAL_STORAGE)
@@ -199,5 +202,12 @@ public class MainActivity extends AppCompatActivity {
 
     @OnClick(R.id.fab)
     public void onClick() {
+        ImageUploadAPI api = new ImageUploadAPI();
+        api.getToken("TomerBu", "1234", new OnTokenReceivedListener() {
+            @Override
+            public void onTokenReceived(LoginResponse infoWithTokenInside) {
+                Log.d("TomerBu", infoWithTokenInside.toString());
+            }
+        });
     }
 }
