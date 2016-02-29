@@ -52,7 +52,7 @@ public class AppManager extends Application {
      * If a request was unauthorized (OKHttp client tests the headers)
      * The authenticator performs a login and updates the token
      * once it updates the token, the request is dispatched again with the token in the header
-     * Also, the token is set in the field so in the next requests we don't hit the login api node again
+     * Also, the token is saved in the token field so in the next requests we don't hit the login api node again
      *
      * @return OKHttp Authenticator
      */
@@ -68,8 +68,10 @@ public class AppManager extends Application {
 
                 //Make a blocking call to get a token, this is done on a background thread already.
                 ImageUploadAPI api = new ImageUploadAPI();
-                LoginResponse loginResponse = api.getTokenBlocking("<UserName>", "<Password>");
-
+                //LoginResponse loginResponse = api.getTokenBlocking("<UserName>", "<Password>");
+                String appId = getResources().getString(R.string.AppId);
+                String appSecret = getResources().getString(R.string.AppSecret);
+                LoginResponse loginResponse = api.getTokenBlocking(appId, appSecret);
                 token = loginResponse.getToken();
 
                 //run the original request with the token from the authorization node.

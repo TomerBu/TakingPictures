@@ -136,6 +136,8 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
+        if (resultCode != RESULT_OK)
+            return;
         switch (requestCode) {
             case REQ_PICK_PICTURE:
                 Uri selectedImageUri = data.getData();
@@ -203,7 +205,9 @@ public class MainActivity extends AppCompatActivity {
     @OnClick(R.id.fab)
     public void onClick() {
         ImageUploadAPI api = new ImageUploadAPI();
-        api.getToken("TomerBu", "1234", new OnTokenReceivedListener() {
+        String appId = getResources().getString(R.string.AppId);
+        String appSecret = getResources().getString(R.string.AppSecret);
+        api.getToken(appId, appSecret, new OnTokenReceivedListener() {
             @Override
             public void onTokenReceived(LoginResponse infoWithTokenInside) {
                 Log.d("TomerBu", infoWithTokenInside.toString());
